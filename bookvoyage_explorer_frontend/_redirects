@@ -1,2 +1,2 @@
-# For Netlify: ensure all routes serve index.html (SPA fallback)
+# For Netlify: ensure all routes serve index.html for SPA routing fallback
 /*    /index.html   200

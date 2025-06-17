@@ -22,4 +22,214 @@ modules by path ./.ve/ 15.1 KiB
     ./.ve/EditorOverlay.css 2.25 KiB [built] [code generated]
     ./node_modules/css-loader/dist/cjs.js!./.ve/EditorOverlay.css 697 bytes [built] [code generated]
   ./.ve/EditorOverlay.jsx 1.58 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 1352 ms
+webpack 5.99.9 compiled successfully in 1437 ms
+assets by path *.js 41.1 KiB
+  asset bundle.js 40.3 KiB [emitted] (name: main)
+  asset main.054f10735696f8858ccc.hot-update.js 854 bytes [emitted] [immutable] [hmr] (name: main)
+asset index.html 11.7 KiB [emitted]
+asset main.054f10735696f8858ccc.hot-update.json 2.16 KiB [emitted] [immutable] [hmr]
+Entrypoint main 41.1 KiB = bundle.js 40.3 KiB main.054f10735696f8858ccc.hot-update.js 854 bytes
+runtime modules 26.6 KiB 9 modules
+
+ERROR in Module not found: SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: Unexpected token / in JSON at position 29
+
+ERROR in Module not found: SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: Unexpected token / in JSON at position 29
+
+ERROR in main
+Module not found: SyntaxError: /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory description file): SyntaxError: Unexpected token / in JSON at position 29
+
+ERROR in Error: Child compilation failed:
+  Module not found: SyntaxError: /home/kavia/workspace/code-generation/bookvoyag  e-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directory   description file): SyntaxError: /home/kavia/workspace/code-generation/bookvoy  age-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (directo  ry description file): SyntaxError: /home/kavia/workspace/code-generation/bookv  oyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (direc  tory description file): SyntaxError: /home/kavia/workspace/code-generation/boo  kvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/package.json (dir  ectory description file): SyntaxError: Unexpected token / in JSON at position   29
+  ModuleNotFoundError: Module not found: SyntaxError: /home/kavia/workspace/code  -generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/pa  ckage.json (directory description file): SyntaxError: /home/kavia/workspace/co  de-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/  package.json (directory description file): SyntaxError: /home/kavia/workspace/  code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_fronten  d/package.json (directory description file): SyntaxError: /home/kavia/workspac  e/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_front  end/package.json (directory description file): SyntaxError: Unexpected token /   in JSON at position 29
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/Compilation.js:2230:28      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :933:13
+      at eval (eval at create (/home/kavia/workspace/code-generation/bookvoyage-  explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/tapable/lib/  HookCodeFactory.js:33:10), <anonymous>:10:1)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :347:22
+      at eval (eval at create (/home/kavia/workspace/code-generation/bookvoyage-  explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/tapable/lib/  HookCodeFactory.js:33:10), <anonymous>:9:1)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :530:22
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :167:10
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :756:23
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/neo-async/async.js:2830:7
+      at done (/home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d  86f1dd5/bookvoyage_explorer_frontend/node_modules/neo-async/async.js:2925:13)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/NormalModuleFactory.js  :1202:23
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/Resolver.js:6  20:22
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/Resolver.js:7  16:21
+      at eval (eval at create (/home/kavia/workspace/code-generation/bookvoyage-  explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/tapable/lib/  HookCodeFactory.js:33:10), <anonymous>:24:1)
+      at done (/home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d  86f1dd5/bookvoyage_explorer_frontend/node_modules/webpack/lib/cache/ResolverCa  chePlugin.js:369:13)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/webpack/lib/cache/ResolverCachePlu  gin.js:204:22
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/Resolver.js:7  16:21
+      at eval (eval at create (/home/kavia/workspace/code-generation/bookvoyage-  explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/tapable/lib/  HookCodeFactory.js:33:10), <anonymous>:10:1)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/Resolver.js:7  16:21
+      at eval (eval at create (/home/kavia/workspace/code-generation/bookvoyage-  explorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/tapable/lib/  HookCodeFactory.js:33:10), <anonymous>:24:1)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/DescriptionFi  lePlugin.js:58:24
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/DescriptionFi  leUtils.js:146:21
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/forEachBail.j  s:39:13
+      at onJson (/home/kavia/workspace/code-generation/bookvoyage-explorer-58797  -d86f1dd5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/Descr  iptionFileUtils.js:131:14)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/DescriptionFi  leUtils.js:81:15
+      at runCallbacks (/home/kavia/workspace/code-generation/bookvoyage-explorer  -58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib  /CachedInputFileSystem.js:52:4)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/CachedInputFi  leSystem.js:279:5
+      at Array.<anonymous> (/home/kavia/workspace/code-generation/bookvoyage-exp  lorer-58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/enhanced-resolv  e/lib/CachedInputFileSystem.js:596:17)
+      at runCallbacks (/home/kavia/workspace/code-generation/bookvoyage-explorer  -58797-d86f1dd5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib  /CachedInputFileSystem.js:45:15)
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/enhanced-resolve/lib/CachedInputFi  leSystem.js:279:5
+      at /home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd  5/bookvoyage_explorer_frontend/node_modules/graceful-fs/graceful-fs.js:123:16
+      at FSReqCallback.readFileAfterClose [as oncomplete] (node:internal/fs/read  _file_context:68:3)
+  
+  - Compilation.js:2230 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:2230:28
+  
+  - NormalModuleFactory.js:933 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:933:13
+  
+  
+  - NormalModuleFactory.js:347 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:347:22
+  
+  
+  - NormalModuleFactory.js:530 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:530:22
+  
+  - NormalModuleFactory.js:167 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:167:10
+  
+  - NormalModuleFactory.js:756 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:756:23
+  
+  - async.js:2830 
+    [bookvoyage_explorer_frontend]/[neo-async]/async.js:2830:7
+  
+  - async.js:2925 done
+    [bookvoyage_explorer_frontend]/[neo-async]/async.js:2925:13
+  
+  - NormalModuleFactory.js:1202 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/NormalModuleFactory.js:1202:23
+  
+  - Resolver.js:620 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/Resolver.js:620:22
+  
+  - Resolver.js:716 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/Resolver.js:716:21
+  
+  
+  - ResolverCachePlugin.js:369 done
+    [bookvoyage_explorer_frontend]/[webpack]/lib/cache/ResolverCachePlugin.js:36    9:13
+  
+  - ResolverCachePlugin.js:204 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/cache/ResolverCachePlugin.js:20    4:22
+  
+  - Resolver.js:716 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/Resolver.js:716:21
+  
+  
+  - Resolver.js:716 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/Resolver.js:716:21
+  
+  
+  - DescriptionFilePlugin.js:58 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/DescriptionFilePlugin.    js:58:24
+  
+  - DescriptionFileUtils.js:146 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/DescriptionFileUtils.j    s:146:21
+  
+  - forEachBail.js:39 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/forEachBail.js:39:13
+  
+  - DescriptionFileUtils.js:131 onJson
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/DescriptionFileUtils.j    s:131:14
+  
+  - DescriptionFileUtils.js:81 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/DescriptionFileUtils.j    s:81:15
+  
+  - CachedInputFileSystem.js:52 runCallbacks
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/CachedInputFileSystem.    js:52:4
+  
+  - CachedInputFileSystem.js:279 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/CachedInputFileSystem.    js:279:5
+  
+  - CachedInputFileSystem.js:596 Array.<anonymous>
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/CachedInputFileSystem.    js:596:17
+  
+  - CachedInputFileSystem.js:45 runCallbacks
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/CachedInputFileSystem.    js:45:15
+  
+  - CachedInputFileSystem.js:279 
+    [bookvoyage_explorer_frontend]/[enhanced-resolve]/lib/CachedInputFileSystem.    js:279:5
+  
+  - graceful-fs.js:123 
+    [bookvoyage_explorer_frontend]/[graceful-fs]/graceful-fs.js:123:16
+  
+  - read_file_context:68 FSReqCallback.readFileAfterClose [as oncomplete]
+    node:internal/fs/read_file_context:68:3
+  
+  - child-compiler.js:211 
+    [bookvoyage_explorer_frontend]/[html-webpack-plugin]/lib/child-compiler.js:2    11:18
+  
+  - Compiler.js:625 finalCallback
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compiler.js:625:5
+  
+  - Compiler.js:661 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compiler.js:661:11
+  
+  - Compiler.js:1347 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compiler.js:1347:17
+  
+  
+  - Hook.js:18 Hook.CALL_ASYNC_DELEGATE [as _callAsync]
+    [bookvoyage_explorer_frontend]/[tapable]/lib/Hook.js:18:14
+  
+  - Compiler.js:1343 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compiler.js:1343:33
+  
+  - Compilation.js:3061 finalCallback
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:3061:11
+  
+  - Compilation.js:3404 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:3404:11
+  
+  
+  - Hook.js:18 Hook.CALL_ASYNC_DELEGATE [as _callAsync]
+    [bookvoyage_explorer_frontend]/[tapable]/lib/Hook.js:18:14
+  
+  - Compilation.js:3397 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:3397:38
+  
+  
+  - Compilation.js:562 fn
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:562:9
+  
+  
+  - Hook.js:18 Hook.CALL_ASYNC_DELEGATE [as _callAsync]
+    [bookvoyage_explorer_frontend]/[tapable]/lib/Hook.js:18:14
+  
+  - Compilation.js:3361 cont
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:3361:34
+  
+  - Compilation.js:3417 
+    [bookvoyage_explorer_frontend]/[webpack]/lib/Compilation.js:3417:10
+  
+  - async.js:3485 symbolIterator
+    [bookvoyage_explorer_frontend]/[neo-async]/async.js:3485:9
+
+1 ERROR in child compilations (Use 'stats.children: true' resp. '--stats-children' for more details)
+webpack 5.99.9 compiled with 5 errors in 291 ms
+Injecting EditorRootWrapper import: ../.ve/EditorRootWrapper
+assets by path *.js 2.9 MiB
+  asset bundle.js 1.47 MiB [emitted] (name: main)
+  asset main.0087248faec33427b984.hot-update.js 1.43 MiB [emitted] [immutable] [hmr] (name: main)
+asset index.html 787 bytes [emitted]
+asset main.0087248faec33427b984.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.9 MiB = bundle.js 1.47 MiB main.0087248faec33427b984.hot-update.js 1.43 MiB
+cached modules 1.26 MiB [cached] 37 modules
+runtime modules 27.5 KiB 14 modules
+javascript modules 74.8 KiB
+  modules by path ./src/*.js 62.6 KiB
+    ./src/index.js 530 bytes [built]
+    ./src/App.js 11.9 KiB [built]
+    ./src/MapPanel.js 22.7 KiB [built]
+    ./src/InfoPanel.js 7.63 KiB [built]
+    ./src/SearchBar.js 2.81 KiB [built]
+    ./src/BucketList.js 8.79 KiB [built]
+    ./src/api.js 8.3 KiB [built]
+  modules by path ./.ve/ 12.2 KiB
+    ./.ve/EditorRootWrapper.js 2.68 KiB [built]
+    ./.ve/EditorOverlay.jsx 1.58 KiB [built]
+    ./.ve/SidePanel.js 7.93 KiB [built]
+webpack 5.99.9 compiled successfully in 393 ms
