@@ -69,11 +69,41 @@ Common components include:
 - Navigation (`.navbar`)
 - Typography (`.title`, `.subtitle`, `.description`)
 
-## Learn More
+## Deployment for Custom Domains
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+You can deploy this app to **GitHub Pages**, **Netlify**, or **Vercel** and use your own custom domain. See below for host-specific instructions and setup.
 
-### Code Splitting
+### GitHub Pages
+- Add the `homepage` field to your `package.json` with your intended domain (**replace `your.custom.domain` below**):
+
+  ```json
+  "homepage": "https://your.custom.domain/"
+  ```
+
+- To deploy, use a tool like [`gh-pages`](https://www.npmjs.com/package/gh-pages) or your CI workflow.
+- For custom domains, create a `CNAME` file (in the `build/` output) containing only your custom domain, e.g.:
+  ```
+  your.custom.domain
+  ```
+  GitHub Pages will route your domain properly if both `homepage` and `CNAME` are set.
+
+### Netlify
+- Deploy the app folder (the build output) to Netlify.
+- The included [`_redirects`](./_redirects) file ensures proper single-page-app routing.
+- In Netlify dashboard, add your custom domain under Site Settings > Domain Management > Add custom domain.
+
+### Vercel
+- Deploy via the Vercel dashboard or using the CLI.
+- In Vercel dashboard, add your domain under Settings > Domains.
+- No special config is needed for SPAs (Vercel handles rewrites automatically).
+
+---
+
+**IMPORTANT:**  
+- If you use a custom domain, update all instances of the default deployment URL with your actual domain.
+- If you serve from a subpath (i.e., not root), update the `homepage` field in `package.json` accordingly, e.g. `"homepage": "https://example.com/subdir/"`.
+
+See more at [Create React App deployment docs](https://facebook.github.io/create-react-app/docs/deployment).
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
