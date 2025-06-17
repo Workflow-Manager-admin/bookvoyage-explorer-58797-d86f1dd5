@@ -1,0 +1,4 @@
+{
+    "command": "PORT=<port> BROWSER=none npm start",
+    "working_directory": "/home/kavia/workspace/code-generation/bookvoyage-explorer-58797-d86f1dd5/bookvoyage_explorer_frontend"
+}
