@@ -18,7 +18,12 @@ export async function fetchBooksFromGoogle(query, options = {}) {
   if (!query || typeof query !== "string") {
     throw new Error("fetchBooksFromGoogle: Query string is required.");
   }
-  const apiKey = process.env.REACT_APP_GOOGLE_BOOKS_API_KEY; // Optional: for higher quota, add your key to .env
+  // PUBLIC_INTERFACE
+  // In the browser (React), env variables must be accessed at build time and must be prefixed with REACT_APP_.
+  // Attempt to access the Google Books API key from the build-time-injected variable if present.
+  const apiKey = typeof process !== "undefined" && process.env && process.env.REACT_APP_GOOGLE_BOOKS_API_KEY
+    ? process.env.REACT_APP_GOOGLE_BOOKS_API_KEY
+    : (window.REACT_APP_GOOGLE_BOOKS_API_KEY || undefined); // fallback for customized deployments
   const params = new URLSearchParams({
     q: query,
     maxResults: options.maxResults ? String(options.maxResults) : "10",
@@ -62,7 +67,10 @@ export async function fetchBookDetailsById(volumeId) {
   if (!volumeId || typeof volumeId !== "string") {
     throw new Error("fetchBookDetailsById: volumeId is required.");
   }
-  const apiKey = process.env.REACT_APP_GOOGLE_BOOKS_API_KEY;
+  const apiKey = typeof process !== "undefined" && process.env && process.env.REACT_APP_GOOGLE_BOOKS_API_KEY
+    ? process.env.REACT_APP_GOOGLE_BOOKS_API_KEY
+    : (window.REACT_APP_GOOGLE_BOOKS_API_KEY || undefined); // fallback for customized deployments
+  
   const endpoint = `https://www.googleapis.com/books/v1/volumes/${encodeURIComponent(volumeId)}${apiKey ? `?key=${apiKey}` : ""}`;
   try {
     const res = await fetch(endpoint);
