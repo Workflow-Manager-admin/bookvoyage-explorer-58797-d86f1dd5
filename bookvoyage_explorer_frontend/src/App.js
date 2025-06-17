@@ -238,7 +238,6 @@ function App() {
               <span className="logo-symbol" role="img" aria-label="Book icon">📚</span>
               BookVoyage Explorer
             </div>
-            <button className="btn" disabled>Login (placeholder)</button>
           </div>
         </div>
       </nav>
