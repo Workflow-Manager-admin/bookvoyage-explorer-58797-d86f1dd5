@@ -205,6 +205,9 @@ function App() {
   // Only show places in map/bucket picker if result type is "place"
   const placesForMap = searchType === "place" ? searchResults : [];
 
+  // -- MapPanel filter state (interactive map/category filters sync) --
+  const [categoryFilters, setCategoryFilters] = useState([]);
+
   // --- UI Render ---
   return (
     <div className="app">
@@ -257,6 +260,8 @@ function App() {
               onAddToBucket={handleAddToBucket}
               bucketList={bucketList.map(x => x.id)}
               isLoading={searchLoading}
+              categoryFilters={categoryFilters}
+              onSetCategoryFilters={setCategoryFilters}
             />
             <BucketList
               places={placesForMap}
