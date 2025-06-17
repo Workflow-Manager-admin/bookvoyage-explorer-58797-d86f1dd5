@@ -73,39 +73,77 @@ Common components include:
 
 You can deploy this app to **GitHub Pages**, **Netlify**, or **Vercel** and use your own custom domain. See below for host-specific instructions and setup.
 
-### GitHub Pages
-- Add the `homepage` field to your `package.json` with your intended domain (**replace `your.custom.domain` below**):
+---
 
-  ```json
-  "homepage": "https://your.custom.domain/"
-  ```
+### GitHub Pages (with Custom Domain)
+1. **Add `homepage` field:**  
+   In your [`package.json`](./package.json), add (or update) the `"homepage"` field with your domain (use HTTPS):
+   ```json
+   "homepage": "https://your.custom.domain/"
+   ```
+   *If serving from a subdirectory, include it:*
+   ```json
+   "homepage": "https://example.com/my-app/"
+   ```
+2. **Create CNAME for custom domain:**  
+   Place a file called [`CNAME`](./CNAME) in the root of your built site (i.e., `build/`), containing _only_ your domain:
+   ```
+   your.custom.domain
+   ```
+   Most deployment tools (and GitHub Pages) will use this at publish-time.
 
-- To deploy, use a tool like [`gh-pages`](https://www.npmjs.com/package/gh-pages) or your CI workflow.
-- For custom domains, create a `CNAME` file (in the `build/` output) containing only your custom domain, e.g.:
-  ```
-  your.custom.domain
-  ```
-  GitHub Pages will route your domain properly if both `homepage` and `CNAME` are set.
-
-### Netlify
-- Deploy the app folder (the build output) to Netlify.
-- The included [`_redirects`](./_redirects) file ensures proper single-page-app routing.
-- In Netlify dashboard, add your custom domain under Site Settings > Domain Management > Add custom domain.
-
-### Vercel
-- Deploy via the Vercel dashboard or using the CLI.
-- In Vercel dashboard, add your domain under Settings > Domains.
-- No special config is needed for SPAs (Vercel handles rewrites automatically).
+3. **Deploy:**  
+   Deploy to GitHub Pages (e.g., using [`gh-pages`](https://www.npmjs.com/package/gh-pages)) or your preferred CI/CD.  
+   GitHub will recognize the `CNAME` and route your custom domain.  
+   **Note:** Updating the `"homepage"` ensures assets load with the proper path.
 
 ---
 
-**IMPORTANT:**  
-- If you use a custom domain, update all instances of the default deployment URL with your actual domain.
-- If you serve from a subpath (i.e., not root), update the `homepage` field in `package.json` accordingly, e.g. `"homepage": "https://example.com/subdir/"`.
+### Netlify (with Custom Domain)
+1. **Deploy build output:**  
+   Drag-and-drop the `build/` directory, or link your repository in the [Netlify dashboard](https://app.netlify.com/).
+2. **SPA routing:**  
+   Ensure you include the [`_redirects`](./_redirects) file with this content (already present):
+   ```
+   /*    /index.html   200
+   ```
+   This lets Netlify serve React SPA routes directly (no 404s).
 
-See more at [Create React App deployment docs](https://facebook.github.io/create-react-app/docs/deployment).
+3. **Add custom domain:**  
+   In your Netlify dashboard:  
+   Site Settings → Domain Management → Add Custom Domain → enter your domain.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
+
+### Vercel (with Custom Domain)
+1. **Deploy via Vercel:**  
+   Use [Vercel CLI](https://vercel.com/docs/cli) or dashboard to import your project, or push your code to a Vercel-linked Git provider.
+2. **Add your domain:**  
+   Settings → Domains → Add Domain.  
+   (No special config needed; Vercel handles SPA routing for React out of the box.)
+3. **Adjust asset paths for subdirectories:**  
+   If deploying to a subpath, set the `"homepage"` value accordingly (as above).
+
+---
+
+#### Additional Notes
+
+- **Static Assets & Paths:**  
+  Setting the correct `"homepage"` ensures all static assets and routing work both for root domains and subpaths.
+
+- **Advanced Routing:**  
+  - For Netlify, you can customize `_redirects` for complex routing needs.
+  - For Vercel and GitHub Pages, SPA routing is handled per above instructions.
+
+- **Troubleshooting:**  
+  - After pointing your domain’s DNS to your host, it may take some time for changes to propagate.
+  - Ensure DNS CNAME/A records are set as per your hosting provider's instructions.
+
+- **More info:**  
+  See [Create React App deployment docs](https://facebook.github.io/create-react-app/docs/deployment).
+
+---
+
 
 ### Analyzing the Bundle Size
 

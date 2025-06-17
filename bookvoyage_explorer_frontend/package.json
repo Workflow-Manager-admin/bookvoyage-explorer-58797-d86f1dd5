@@ -1,5 +1,6 @@
 {
   "name": "react-kavia",
+  "homepage": "https://your.custom.domain/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
