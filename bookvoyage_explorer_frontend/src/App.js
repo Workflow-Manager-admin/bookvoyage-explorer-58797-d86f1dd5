@@ -55,14 +55,49 @@ function App() {
   function handleSelectPlace(placeId) {
     setSelectedPlaceId(placeId);
 
-    // Demo: show sample trivia & books for selected place
+    // Demo: showing multiple trivia items for improved interactivity
+    // Here, for demo, we'll create multiple facts per place if available.
     const place = MOCK_PLACES.find((p) => p.id === placeId);
     if (place) {
-      setTriviaInfo({
-        title: place.name,
-        summary: place.trivia,
-        books: place.books
-      });
+      // Multiple trivia entries demo: summary, url, and media
+      // In real app, you'd fetch richer data
+      let entries = [
+        {
+          title: place.name,
+          summary: place.trivia,
+          books: place.books
+        }
+      ];
+      // Add extra demo trivia fact, with a link for interactivity
+      if (place.name === "Paris, France") {
+        entries.push({
+          title: "Eiffel Tower Fact",
+          summary: "Did you know the <strong>Eiffel Tower</strong> was built for the 1889 World's Fair?",
+          link: "https://en.wikipedia.org/wiki/Eiffel_Tower",
+          cover: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg",
+          books: [
+            { title: "Paris Revealed", author: "Stephen Clarke", link: "https://www.goodreads.com/book/show/11199794-paris-revealed" }
+          ]
+        });
+      }
+      if (place.name === "London, UK") {
+        entries.push({
+          title: "Sherlock Holmes",
+          summary: "221B Baker Street is the legendary home of Sherlock Holmes. See <a href='https://en.wikipedia.org/wiki/221B_Baker_Street'>221B Baker St</a>.",
+          link: "https://en.wikipedia.org/wiki/221B_Baker_Street",
+          books: [
+            { title: "The Adventures of Sherlock Holmes", author: "Arthur Conan Doyle", link: "https://www.goodreads.com/book/show/3590.The_Adventures_of_Sherlock_Holmes" }
+          ]
+        });
+      }
+      if (place.name === "Kyoto, Japan") {
+        entries.push({
+          title: "Kyoto Temples",
+          summary: "Fushimi Inari-taisha, with its 10,000 iconic torii gates, is a must-see.",
+          link: "https://en.wikipedia.org/wiki/Fushimi_Inari-taisha"
+        });
+      }
+      setTriviaInfo({ entries });
     }
   }
 
