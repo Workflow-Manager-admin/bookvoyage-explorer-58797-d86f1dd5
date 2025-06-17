@@ -98,7 +98,8 @@ body {
   min-width: var(--sidebar-width);
   padding: 28px 18px 18px 18px;
   border-right: 1px solid var(--border-color);
-  background: var(--surface-alt);
+  /* InfoPanel distinctive style using primary color background tint */
+  background: #f4f7fa;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -106,14 +107,21 @@ body {
   gap: 8px;
   z-index: 5;
   min-height: 100%;
+  box-shadow: 0 2px 14px 0 rgba(75,85,99,0.08);
+  /* Add visible separation */
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 8px;
 }
 
 .sidebar h2 {
   font-size: 1.13rem;
   margin-bottom: 0.55em;
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 700;
+  color: #4B5563;
   letter-spacing: -0.02em;
+  text-shadow: 0 1px 0 #fff6, 0 1px 4px #d6e2f480;
 }
 
 .sidebar-content {
@@ -141,21 +149,21 @@ body {
   align-items: center;
   gap: 10px;
   margin-bottom: 26px;
-  background: var(--surface-alt);
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+  background: #fffdf7;
+  /* Uses a soft yellow accent for distinction */
+  border-radius: 10px;
+  border: 1.5px solid #fbe3a2;
+  box-shadow: 0 2px 10px 0 #fbbf2440;
   position: relative;
 }
 
 .search-input {
   flex: 1 1 0%;
   padding: 10px 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border: 1.5px solid #9CA3AF;
+  border-radius: 5px;
   font-size: 1.05rem;
-  background: var(--surface-muted);
+  background: #fafaf6;
   color: var(--text-color);
   outline: none;
   transition: border-color 0.18s;
@@ -188,16 +196,18 @@ body {
   min-width: 0;
   min-height: 340px;
   height: 100%;
-  background: var(--surface-alt);
-  border-radius: 11px;
+  /* Use a harmonious blue-grey primary tint, slightly lighter */
+  background: #e4e7ec;
+  border-radius: 13px;
   margin-bottom: 0;
   overflow: visible;
-  box-shadow: 0 3px 12px 0 rgba(36,41,56,0.04);
+  /* More pronounced shadow with blue-grey, less yellow than accent, more visible */
+  box-shadow: 0 4px 28px 0 #4b556327, 0 1px 4px 0 #74869c14;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  border: 1px solid var(--border-color);
+  border: 2px solid #4B5563;
   position: relative;
 }
 
@@ -234,11 +244,12 @@ body {
   width: var(--bucket-width);
   min-width: var(--bucket-width);
   max-width: 100%;
-  background: var(--surface-alt);
+  /* Accent panel color is a harmonious pale gold */
+  background: #fffbeb;
   margin-left: 0;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
-  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px 0 #FBBF2433, 0 2px 8px 0 #facb2766;
+  border: 2px solid #FBBF24;
   padding: 22px 16px 14px 16px;
   box-sizing: border-box;
   display: flex;
@@ -250,12 +261,13 @@ body {
 }
 
 .bucket-list h2 {
-  font-size: 1.08rem;
+  font-size: 1.11rem;
   margin-top: 0;
-  margin-bottom: 0.45em;
-  color: var(--primary);
-  font-weight: 600;
+  margin-bottom: 0.58em;
+  color: #cf8600;
+  font-weight: 800;
   letter-spacing: -0.01em;
+  text-shadow: 0 1px 0 #fff, 0 1px 6px #ffe48d42;
 }
 
 .bucket-list-content {
@@ -348,6 +360,8 @@ h3 {
   .sidebar,
   .bucket-list {
     display: none;
+    background: #f4f7fa; /* Info area remains blue-tinted on mobile if shown */
+    box-shadow: 0 2px 16px #4B556340;
   }
   .main-content {
     flex-direction: column;
@@ -373,6 +387,8 @@ h3 {
     height: auto;
     min-width: 0;
     margin-bottom: 18px;
+    background: #e4e7ec;
+    box-shadow: 0 2px 16px #4B556330;
   }
 }
 
