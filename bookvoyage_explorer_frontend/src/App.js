@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 
 // Import stub components (now used for layout)
@@ -6,6 +6,8 @@ import MapPanel from './MapPanel';
 import InfoPanel from './InfoPanel';
 import SearchBar from './SearchBar';
 import BucketList from './BucketList';
+// Import the API stub functions
+import { fetchBooksFromGoogle, fetchWikipediaSummary } from "./api";
 
 /**
  * BookVoyage Explorer Main Container & Component Hierarchy
@@ -27,7 +29,26 @@ import BucketList from './BucketList';
  * </div>
  */
 
+
 function App() {
+
+  // Example stub usage: fetch dummy book and Wikipedia data on mount;
+  // Replace with stateful/search-driven logic in future.
+  useEffect(() => {
+    // TODO: Remove this example, integrate calls where user searches or selects a book/place.
+    async function demoStubCalls() {
+      // Fetch dummy Google Books data for "Paris"
+      const books = await fetchBooksFromGoogle("Paris");
+      console.log("[STUB DEMO] Google Books API result:", books);
+
+      // Fetch dummy Wikipedia info for "Paris"
+      const wiki = await fetchWikipediaSummary("Paris");
+      console.log("[STUB DEMO] Wikipedia API result:", wiki);
+    }
+    demoStubCalls();
+  }, []);
+  
+
   return (
     <div className="app">
       {/* Top Navbar/Header */}
@@ -51,12 +72,22 @@ function App() {
         {/* Main explorer area (map/search/bucket list) */}
         <section className="explorer-panel">
           {/* Search Bar */}
-          <SearchBar />
+          <SearchBar 
+            // TODO: Integrate API stubs - Example:
+            // onSearch={async (query) => {
+            //   const books = await fetchBooksFromGoogle(query);
+            //   // Use books data for state/display
+            // }}
+          />
 
           {/* Map & Bucket List Panel Row */}
           <div className="map-and-bucket">
-            <MapPanel />
-            <BucketList />
+            <MapPanel 
+              // TODO: Use Google Books and Wikipedia data to highlight locations on the map.
+            />
+            <BucketList 
+              // TODO: Save items retrieved from API stubs to the bucket list
+            />
           </div>
         </section>
       </div>
