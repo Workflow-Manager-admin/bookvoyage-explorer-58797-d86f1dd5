@@ -222,17 +222,12 @@ function App() {
     <div className="app">
       <nav
         className="navbar"
-        style={{
-          color: '#4b5563',
-          backgroundColor: '#0d1301'
-        }}>
+      >
         <div className="container">
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            width: '100%',
-            color: '#4b5563',
-            backgroundColor: '#0be4f4'
+            width: '100%'
           }}>
             <div className="logo">
               <span className="logo-symbol" role="img" aria-label="Book icon">📚</span>
