@@ -207,6 +207,18 @@ function App() {
 
   // -- MapPanel filter state (interactive map/category filters sync) --
   const [categoryFilters, setCategoryFilters] = useState([]);
+  // New: Marker hover/preview state for MapPanel and cross-panel sync
+  const [previewPlaceId, setPreviewPlaceId] = useState(null);
+
+  // Helper: propagate hover state to InfoPanel, MapPanel, BucketList if needed
+  const handleMarkerPreview = useCallback((placeId) => {
+    setPreviewPlaceId(placeId);
+  }, []);
+
+  // [Tight state sync note]
+  // Show marker preview in InfoPanel if previewPlaceId is set, otherwise show selectedPlaceId;
+  // Always show selectedPlaceId for full selection/book/fact info.
+  // BucketList draws from current places and bucket state as before.
 
   // --- UI Render ---
   return (
@@ -236,13 +248,31 @@ function App() {
       <div className="main-content">
         <InfoPanel
           triviaInfo={
-            triviaLoading && selectedPlaceId
+            // If hovering, show a minimal preview (if hoverPlace exists in results)
+            previewPlaceId &&
+            placesForMap.find((p) => p.id === previewPlaceId)
+              ? {
+                  entries: [
+                    // Compose a lightweight preview for InfoPanel:
+                    (() => {
+                      const p = placesForMap.find((x) => x.id === previewPlaceId);
+                      return {
+                        title: p.name,
+                        summary: p.books && p.books.length > 0 ? `"${p.books[0].title}" by ${p.books[0].author}` : "",
+                        cover: (p.books && p.books[0] && p.books[0].cover) || p.cover || undefined,
+                        link: (p.books && p.books[0] && p.books[0].link) || undefined
+                      }
+                    })()
+                  ]
+                }
+              // else, use selected/loaded state
+              : (triviaLoading && selectedPlaceId
               ? { entries: [{ title: 'Loading...', summary: 'Fetching live info...' }] }
               : triviaError && selectedPlaceId
                 ? { entries: [{ title: 'Error', summary: triviaError }] }
-                : triviaInfo
+                : triviaInfo)
           }
-          selectedPlaceId={selectedPlaceId}
+          selectedPlaceId={previewPlaceId || selectedPlaceId}
         />
         <section className="explorer-panel">
           <SearchBar
@@ -262,6 +292,9 @@ function App() {
               isLoading={searchLoading}
               categoryFilters={categoryFilters}
               onSetCategoryFilters={setCategoryFilters}
+              // --- New handlers for preview state/hover sync:
+              onPreviewPlace={handleMarkerPreview}
+              previewPlaceId={previewPlaceId}
             />
             <BucketList
               places={placesForMap}

@@ -17,6 +17,8 @@ import React, { useState } from "react";
  *  - isLoading: boolean for loading UI
  *  - onSetCategoryFilters: callback for category filter changes
  *  - categoryFilters: array of current filter values (optional)
+ *  - [NEW] onPreviewPlace: handler(placeId) for on-hover previews (sync to parent)
+ *  - [NEW] previewPlaceId: id of the current previewed place (optional, for sync)
  */
 function MapPanel({
   places = [],
@@ -27,10 +29,16 @@ function MapPanel({
   isLoading = false,
   onSetCategoryFilters,
   categoryFilters, // Array of category strings (optional)
+  onPreviewPlace,
+  previewPlaceId,
 }) {
-  // Info popup state (for click). Hover preview state (for mouse-over only).
+  // Info popup state (for click). Hover preview state (for mouse-over only/local highlight).
   const [popupPlaceId, setPopupPlaceId] = useState(null);
-  const [hoverPlaceId, setHoverPlaceId] = useState(null);
+  // Remove local hover state; trust previewPlaceId if supplied, else use local
+  const [localHoverPlaceId, setLocalHoverPlaceId] = useState(null);
+
+  // Respect previewPlaceId when supplied, else fall back to local
+  const hoverPlaceId = typeof previewPlaceId === "string" ? previewPlaceId : localHoverPlaceId;
 
   // ---- Category Filter Setup ----
   // Collect unique categories and regions
@@ -64,16 +72,19 @@ function MapPanel({
 
   // ---- Marker Hover Handlers ----
   function handleMarkerMouseEnter(placeId) {
-    setHoverPlaceId(placeId);
+    setLocalHoverPlaceId(placeId);
+    if (onPreviewPlace) onPreviewPlace(placeId);
   }
   function handleMarkerMouseLeave() {
-    setHoverPlaceId(null);
+    setLocalHoverPlaceId(null);
+    if (onPreviewPlace) onPreviewPlace(null);
   }
   // Handler: Clicking a marker
   function handleMarkerClick(placeId) {
     if (onSelectPlace) onSelectPlace(placeId);
     setPopupPlaceId(placeId);
-    setHoverPlaceId(null);
+    setLocalHoverPlaceId(null);
+    if (onPreviewPlace) onPreviewPlace(null);
   }
   // Handler: closing info popup
   function handleClosePopup() {
@@ -269,33 +280,66 @@ function MapPanel({
                 {place.region || place.category || "Place"}
               </span>
               {/* Hover preview shows over marker */}
-              {hoverPlaceId === place.id && place.books && place.books.length > 0 && (
+              {hoverPlaceId === place.id && (
                 <div style={{
                   position: "absolute",
-                  top: -56,
-                  left: -10,
-                  zIndex: 100,
+                  top: -68,
+                  left: -24,
+                  zIndex: 130,
                   background: "#fff",
                   border: "2px solid #FBBF24",
-                  borderRadius: 7,
-                  padding: "6px 13px",
-                  minWidth: 170,
-                  maxWidth: 210,
-                  boxShadow: "0 2px 12px #FBBF241C",
-                  fontSize: "0.99em"
+                  borderRadius: 8,
+                  padding: "8px 14px 9px 14px",
+                  minWidth: 185,
+                  maxWidth: 240,
+                  boxShadow: "0 2px 16px #FBBF2424",
+                  fontSize: "0.99em",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start"
                 }}>
-                  <strong>{place.name}</strong>
-                  <div style={{ margin: "6px 0 2px 0" }}>
-                    {place.books[0].title} <span style={{ color: "#AC7A25" }}>by</span> {place.books[0].author}
-                  </div>
-                  {place.books[0].cover && (
-                    <img src={place.books[0].cover} alt="cover" style={{
-                      width: 38, height: 55, objectFit: "cover", borderRadius: 4, marginTop: 2, marginBottom: 2
-                    }} />
+                  <strong style={{ fontSize: "1.04em", marginBottom: 3 }}>{place.name}</strong>
+                  {/* Show first book main info */}
+                  {place.books && place.books[0] && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginBottom: 4 }}>
+                      {place.books[0].cover && (
+                        <img src={place.books[0].cover} alt="cover" style={{
+                          width: 34,
+                          height: 49,
+                          objectFit: "cover",
+                          borderRadius: 4,
+                          boxShadow: "0 1px 3px #e5e7eb66"
+                        }} />
+                      )}
+                      <span>
+                        <span style={{ fontWeight: 500 }}>{place.books[0].title}</span>
+                        <br />
+                        <span style={{ fontSize: "0.98em", color: "#AC7A25" }}>by</span> {place.books[0].author}
+                        <br />
+                        {/* Book link */}
+                        {place.books[0].link && (
+                          <a href={place.books[0].link} className="link" style={{ fontSize: "0.94em", display: "inline-block", marginTop: 2 }}
+                            target="_blank" rel="noopener noreferrer">View Book 🔗</a>
+                        )}
+                      </span>
+                    </div>
                   )}
-                  <div>
-                    <a href={place.books[0].link} className="link" style={{ fontSize: "0.91em" }} target="_blank" rel="noopener noreferrer">Book link</a>
-                  </div>
+                  {/* Show author link if possible */}
+                  {place.books && place.books[0] && place.books[0].author && (
+                    <a
+                      className="link"
+                      style={{ fontSize: "0.93em", marginTop: 2 }}
+                      href={`https://www.google.com/search?q=${encodeURIComponent(place.books[0].author + " author")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >About author</a>
+                  )}
+                  {/* Show all cover images */}
+                  {place.books && place.books.length > 1 && (
+                    <div style={{ marginTop: 5, fontSize: "0.89em", color: "#9CA3AF" }}>
+                      +{place.books.length - 1} more book{place.books.length > 2 ? "s" : ""}
+                    </div>
+                  )}
                 </div>
               )}
             </li>
@@ -341,6 +385,18 @@ function MapPanel({
               {/* Optional cover (for book-driven results) */}
               {popupPlace.cover && (
                 <img style={{ maxWidth: 106, borderRadius: 8, marginBottom: 9 }} src={popupPlace.cover} alt="Cover" />
+              )}
+              {/* Author link if available */}
+              {popupPlace.books && popupPlace.books[0] && popupPlace.books[0].author && (
+                <div style={{ marginBottom: 8 }}>
+                  <a
+                    className="link"
+                    style={{ fontSize: "1em", color: "#1b7cc2" }}
+                    href={`https://www.google.com/search?q=${encodeURIComponent(popupPlace.books[0].author + " author")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >By {popupPlace.books[0].author}</a>
+                </div>
               )}
               <div style={{ color: "#4B5563", marginBottom: 8, fontSize: "1em" }}>
                 {popupPlace.description}
