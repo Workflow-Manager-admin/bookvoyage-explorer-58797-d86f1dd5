@@ -46,7 +46,8 @@ function App() {
 
   // STATE
   const [selectedPlaceId, setSelectedPlaceId] = useState(null); // id of the place selected on map
-  const [bucketList, setBucketList] = useState([]); // array of place ids
+  // Bucket list now stores array of {id, note} objects for each place in order
+  const [bucketList, setBucketList] = useState([]); // array of { id, note }
   const [triviaInfo, setTriviaInfo] = useState({}); // {title, summary, books}
   // Optionally, loading state for fetches (not needed for this stub)
 
@@ -101,18 +102,45 @@ function App() {
     }
   }
 
-  // Add a place to the bucket list
+  // Add a place to the bucket list (with note field, and de-dupe by id)
   // PUBLIC_INTERFACE
   function handleAddToBucket(placeId) {
-    setBucketList((prev) =>
-      prev.includes(placeId) ? prev : [...prev, placeId]
-    );
+    setBucketList((prev) => {
+      // Support legacy: prev might be array of ids
+      const items = Array.isArray(prev)
+        ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" })))
+        : [];
+      if (items.some(item => item.id === placeId)) return items;
+      return [...items, { id: placeId, note: "" }];
+    });
   }
 
   // Remove a place from the bucket list
   // PUBLIC_INTERFACE
   function handleRemoveFromBucket(placeId) {
-    setBucketList((prev) => prev.filter((id) => id !== placeId));
+    setBucketList((prev) => {
+      // Support legacy: prev might be array of ids
+      const items = Array.isArray(prev)
+        ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" })))
+        : [];
+      return items.filter(item => item.id !== placeId);
+    });
+  }
+
+  // PUBLIC_INTERFACE
+  // Handler to reorder bucket list items (list is array of { id, note })
+  function handleReorderBucketList(newList) {
+    setBucketList(newList);
+  }
+
+  // PUBLIC_INTERFACE
+  // Handler to update note per place in bucket
+  function handleUpdateNote(placeId, note) {
+    setBucketList((prev) =>
+      prev.map((item) =>
+        item.id === placeId ? { ...item, note } : item
+      )
+    );
   }
 
   // Demo useEffect: On first load, show trivia for first mock place
@@ -171,6 +199,8 @@ function App() {
               places={MOCK_PLACES}
               bucketList={bucketList}
               onRemoveFromBucket={handleRemoveFromBucket}
+              onUpdateBucketListReorder={handleReorderBucketList}
+              onUpdateNote={handleUpdateNote}
             />
           </div>
         </section>
