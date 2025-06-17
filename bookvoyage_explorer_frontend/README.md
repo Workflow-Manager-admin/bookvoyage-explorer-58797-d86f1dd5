@@ -71,6 +71,12 @@ Common components include:
 
 ## Deployment for Custom Domains
 
+This app is pre-configured for smooth deployment to static hosts with a custom domain. 
+- Static asset loading and React SPA routing are set up for **GitHub Pages**, **Netlify**, and **Vercel** out of the box.
+- `homepage` in [`package.json`](./package.json) is set to:  
+  `"https://your.custom.domain/"`
+- [`CNAME`](./CNAME) and [`_redirects`](./_redirects) are present in the project root.
+
 You can deploy this app to **GitHub Pages**, **Netlify**, or **Vercel** and use your own custom domain. See below for host-specific instructions and setup.
 
 ---
