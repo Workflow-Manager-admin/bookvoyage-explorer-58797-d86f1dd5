@@ -98,13 +98,9 @@ function App() {
           ];
         }
         setSearchResults(results);
-        if (results[0]) {
-          setSelectedPlaceId(results[0].id);
-          setSelectedPlace(results[0]);
-        } else {
-          setSelectedPlaceId(null);
-          setSelectedPlace(null);
-        }
+        // Do NOT auto-select any place on search!
+        setSelectedPlaceId(null);
+        setSelectedPlace(null);
       } catch (err) {
         setSearchError(err?.message || "Unknown error during search.");
       }
@@ -114,15 +110,16 @@ function App() {
   );
 
   // PUBLIC_INTERFACE
-  // Initial demo/search load
-  useEffect(() => {
-    (async () => {
-      setQuery("Paris");
-      setSearchType("place");
-      await handleSearch("Paris", "place");
-    })();
-    // eslint-disable-next-line
-  }, []);
+  // Optional: If you want to load initial data without auto-selecting, you can trigger a blank state or leave empty.
+  // On app load, do NOT trigger any search or default assignment of place/trivia. All selections remain null until user interacts.
+  // useEffect intentionally left blank.
+
+  // useEffect(() => {
+  //   (async () => {
+  //     // No-op for first load: no search or auto-selection!
+  //   })();
+  //   // eslint-disable-next-line
+  // }, []);
 
   // PUBLIC_INTERFACE
   // Select a place/book/author and retrieve live trivia/info
@@ -248,7 +245,7 @@ function App() {
       <div className="main-content">
         <InfoPanel
           triviaInfo={
-            // If hovering, show a minimal preview (if hoverPlace exists in results)
+            // If nothing is previewed or selected, show neutral/empty state.
             previewPlaceId &&
             placesForMap.find((p) => p.id === previewPlaceId)
               ? {
@@ -265,12 +262,12 @@ function App() {
                     })()
                   ]
                 }
-              // else, use selected/loaded state
+              // else, use selected/loaded state only if selectedPlaceId
               : (triviaLoading && selectedPlaceId
-              ? { entries: [{ title: 'Loading...', summary: 'Fetching live info...' }] }
-              : triviaError && selectedPlaceId
-                ? { entries: [{ title: 'Error', summary: triviaError }] }
-                : triviaInfo)
+                  ? { entries: [{ title: 'Loading...', summary: 'Fetching live info...' }] }
+                  : triviaError && selectedPlaceId
+                    ? { entries: [{ title: 'Error', summary: triviaError }] }
+                    : (selectedPlaceId ? triviaInfo : undefined))
           }
           selectedPlaceId={previewPlaceId || selectedPlaceId}
         />
