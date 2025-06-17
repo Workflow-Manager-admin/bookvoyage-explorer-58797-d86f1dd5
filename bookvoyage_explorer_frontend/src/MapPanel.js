@@ -1,24 +1,21 @@
 import React, { useState } from "react";
 
 /**
- * MapPanel Component (Enhanced Demo Version)
+ * MapPanel Component (Live Data Version)
  *
  * PUBLIC_INTERFACE
  *
- * Shows clickable "markers" for demo places, lets user filter by category/type,
+ * Shows clickable "markers" for places, lets user select a place,
  * displays info bubble on marker selection, and allows "add to bucket" action.
- * Integrates with parent state for selection and bucket list.
+ * Accepts real API-driven places array.
  *
  * Receives props:
- *  - places: array of place objects { id, name, trivia, books, ...type/category }
+ *  - places: array of place objects { id, name, books, ... }
  *  - selectedPlaceId: id of currently selected place
  *  - onSelectPlace: handler for selecting a marker
  *  - onAddToBucket: handler for adding a place to user's bucket list
  *  - bucketList: array of place ids in bucket
- *
- * In a real app, rendering and marker logic would be powered by a map SDK (Mapbox,
- * Google Maps, Leaflet, etc.), and info bubble would be an overlay.
- * Here, we simulate this with rich demo data and more realistic logic.
+ *  - isLoading: boolean for loading UI
  */
 function MapPanel({
   places = [],
@@ -26,219 +23,62 @@ function MapPanel({
   onSelectPlace,
   onAddToBucket,
   bucketList = [],
+  isLoading = false
 }) {
-  // ---- Demo Data: Enhanced Place List ----
-  // If no places provided, fallback to an enhanced set
-  const demoPlaces = places.length > 0 ? places : [
-    {
-      id: 'paris',
-      name: "Paris, France",
-      trivia: "Known as the City of Light, famous for the Eiffel Tower.",
-      books: [
-        { title: "The Hunchback of Notre-Dame", author: "Victor Hugo" },
-        { title: "Paris to the Moon", author: "Adam Gopnik" }
-      ],
-      category: "City",
-      region: "Europe"
-    },
-    {
-      id: 'london',
-      name: "London, UK",
-      trivia: "Home of Big Ben and Sherlock Holmes.",
-      books: [
-        { title: "Neverwhere", author: "Neil Gaiman" },
-        { title: "Oliver Twist", author: "Charles Dickens" }
-      ],
-      category: "City",
-      region: "Europe"
-    },
-    {
-      id: 'kyoto',
-      name: "Kyoto, Japan",
-      trivia: "Ancient capital, famous for temples and cherry blossoms.",
-      books: [
-        { title: "Memoirs of a Geisha", author: "Arthur Golden" },
-      ],
-      category: "City",
-      region: "Asia"
-    },
-    {
-      id: 'uluru',
-      name: "Uluru (Ayers Rock), Australia",
-      trivia: "Sacred sandstone monolith in Australia's Outback.",
-      books: [
-        { title: "Mutant Message Down Under", author: "Marlo Morgan" }
-      ],
-      category: "Landmark",
-      region: "Australia"
-    },
-    {
-      id: 'venice',
-      name: "Venice, Italy",
-      trivia: "The city of canals, gondolas, and masked carnivals.",
-      books: [
-        { title: "Death in Venice", author: "Thomas Mann" }
-      ],
-      category: "City",
-      region: "Europe"
-    },
-    {
-      id: 'andes',
-      name: "The Andes Mountains",
-      trivia: "Longest continental mountain range, stretches along South America.",
-      books: [
-        { title: "Turn Right at Machu Picchu", author: "Mark Adams" }
-      ],
-      category: "Natural Wonder",
-      region: "South America"
-    },
-    {
-      id: 'santorini',
-      name: "Santorini, Greece",
-      trivia: "Iconic blue-domed churches, caldera views, and sunsets.",
-      books: [
-        { title: "The Sisterhood of the Traveling Pants", author: "Ann Brashares" }
-      ],
-      category: "Island",
-      region: "Europe"
-    },
-    {
-      id: 'yosemite',
-      name: "Yosemite National Park, USA",
-      trivia: "Majestic granite cliffs, waterfalls, and sequoias.",
-      books: [
-        { title: "The Yosemite", author: "John Muir" }
-      ],
-      category: "National Park",
-      region: "North America"
-    },
-    {
-      id: 'transylvania',
-      name: "Transylvania, Romania",
-      trivia: "Count Dracula's legendary homeland.",
-      books: [
-        { title: "Dracula", author: "Bram Stoker" }
-      ],
-      category: "Region",
-      region: "Europe"
-    },
-    {
-      id: 'cairo',
-      name: "Cairo, Egypt",
-      trivia: "Gateway to the pyramids and sphinx on the Nile.",
-      books: [
-        { title: "Death on the Nile", author: "Agatha Christie" }
-      ],
-      category: "City",
-      region: "Africa"
-    }
-  ];
-
-  // ---- Filtering Logic ----
-  // Compute a list of unique categories and regions from the data.
-  const allCategories = [
-    ...new Set(demoPlaces.map(p => p.category || "Other"))
-  ];
-  const allRegions = [
-    ...new Set(demoPlaces.map(p => p.region || "Other"))
-  ];
-
-  // Local state: selected filter for demo (by category or region)
-  const [filterType, setFilterType] = useState('All');
-  const [filterMode, setFilterMode] = useState('category'); // or 'region'
-  // Local state: info-bubble visibility (open for marker), for future expansion in real map
+  // Local state: info popup for the selected marker
   const [popupPlaceId, setPopupPlaceId] = useState(null);
 
-  // Filtering places by selected category/region (but don't filter out the currently selected marker)
-  const filteredPlaces = demoPlaces.filter(
-    (p) =>
-      filterType === 'All' ||
-      (filterMode === "category" ? (p.category === filterType || p.id === selectedPlaceId) :
-        (p.region === filterType || p.id === selectedPlaceId))
-  );
-
-  // Find selected place for info bubble
-  const selectedPlace = demoPlaces.find(p => p.id === selectedPlaceId);
-
-  // Handler: Clicking a marker
-  // Simulates a map marker click → updates selection globally and shows popup locally
-  function handleMarkerClick(placeId) {
-    if (onSelectPlace) onSelectPlace(placeId);
-    setPopupPlaceId(placeId); // opens info popup for this marker
+  // No search results/loading → Show loading or empty state
+  if (isLoading) {
+    return (
+      <div className="map-panel" style={{ justifyContent: "center", alignItems: "center" }}>
+        <div className="map-placeholder">
+          <h3>Loading...</h3>
+          <p>Fetching live places/books…</p>
+        </div>
+      </div>
+    );
+  }
+  if (!places?.length) {
+    return (
+      <div className="map-panel" style={{ justifyContent: "center", alignItems: "center" }}>
+        <div className="map-placeholder">
+          <h3>No Places</h3>
+          <p>No results found. Please search for a place or book above.</p>
+        </div>
+      </div>
+    );
   }
 
+  // Handler: Clicking a marker
+  function handleMarkerClick(placeId) {
+    if (onSelectPlace) onSelectPlace(placeId);
+    setPopupPlaceId(placeId);
+  }
   // Handler: closing info popup
   function handleClosePopup() {
     setPopupPlaceId(null);
   }
 
-  // Handler: Filtering change
-  function handleFilterChange(e) {
-    setFilterType(e.target.value);
-    setPopupPlaceId(null);
-  }
-
-  // Handler: Toggle filter mode (category/region)
-  function handleFilterModeChange(e) {
-    setFilterMode(e.target.value);
-    setFilterType('All');
-    setPopupPlaceId(null);
-  }
-
-
   return (
     <div className="map-panel" style={{ position: "relative" }}>
       <div className="map-placeholder">
-        <h3>Interactive Map</h3>
-        <p>[Click a marker to select. Filter by category or region to explore!]</p>
-
-        {/* ---- Filter Controls ---- */}
-        <form style={{
-          display: "flex", gap: 12, margin: "8px 0 16px 0", alignItems: "center", flexWrap: "wrap"
-        }}
-        onSubmit={e => e.preventDefault()}>
-          <label htmlFor="filter-mode">
-            <select
-              id="filter-mode"
-              style={{ fontSize: '0.95em', padding: '2px 10px' }}
-              value={filterMode}
-              onChange={handleFilterModeChange}
-              aria-label="Filter Mode"
-            >
-              <option value="category">Filter by Category</option>
-              <option value="region">Filter by Region</option>
-            </select>
-          </label>
-          <label htmlFor="filter-type">
-            <select
-              id="filter-type"
-              style={{ fontSize: '0.95em', padding: '2px 10px' }}
-              value={filterType}
-              onChange={handleFilterChange}
-              aria-label="Place type or region"
-            >
-              <option value="All">All</option>
-              {(filterMode === "category" ? allCategories : allRegions).map(t =>
-                <option key={t} value={t}>{t}</option>
-              )}
-            </select>
-          </label>
-        </form>
-
-        {/* ---- Marker List (simulated) ---- */}
+        <h3>Results Map</h3>
+        <p>Click a place marker below to view trivia and books!</p>
+        {/* Marker List - real places from search */}
         <ul
           style={{
-            marginTop: 8,
+            marginTop: 10,
             marginBottom: 0,
-            paddingLeft: '0',
-            listStyle: 'none',
-            display: 'flex',
-            gap: '9px',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start'
+            paddingLeft: 0,
+            listStyle: "none",
+            display: "flex",
+            gap: "9px",
+            flexWrap: "wrap",
+            justifyContent: "flex-start"
           }}
         >
-          {filteredPlaces.map((place) => (
+          {places.map(place => (
             <li
               key={place.id}
               style={{
@@ -264,7 +104,7 @@ function MapPanel({
               aria-label={`Select ${place.name}`}
               onKeyDown={e => { if (e.key === 'Enter') handleMarkerClick(place.id); }}
             >
-              {/* Place "Marker" visual */}
+              {/* Marker visual */}
               <div style={{
                 width: 30, height: 30,
                 borderRadius: "50%",
@@ -279,7 +119,7 @@ function MapPanel({
                 <span role="img" aria-label="map marker">📍</span>
               </div>
               <span style={{ fontSize: '0.96em', textAlign: 'center' }}>
-                {place.name.split(',')[0]} {/* Show short name */}
+                {place.name?.split(',')[0] || place.name}
               </span>
               <span style={{
                 fontSize: '0.71em',
@@ -287,21 +127,21 @@ function MapPanel({
                 marginTop: 1,
                 fontWeight: 400
               }}>
-                {place.category || place.region}
+                {place.region || place.category || "Place"}
               </span>
             </li>
           ))}
         </ul>
 
-        {/* ---- Marker Info Popup ---- */}
+        {/* ---- Marker Details Popup ---- */}
         {popupPlaceId && (() => {
-          const popupPlace = demoPlaces.find(p => p.id === popupPlaceId);
+          const popupPlace = places.find(p => p.id === popupPlaceId);
           if (!popupPlace) return null;
           return (
             <div style={{
               position: 'absolute',
               left: '54%',
-              top: '26%',
+              top: '22%',
               minWidth: 260,
               maxWidth: 300,
               zIndex: 12,
@@ -328,27 +168,28 @@ function MapPanel({
               >×</button>
               <div style={{ marginBottom: 7, fontSize: "1.07em", fontWeight: 700 }}>
                 {popupPlace.name}
-                <span style={{
-                  fontWeight: 500,
-                  marginLeft: 9,
-                  fontSize: "0.81em",
-                  background: "#fbbf2420",
-                  color: "#848585",
-                  padding: "1px 8px",
-                  borderRadius: "8px"
-                }}>
-                  {popupPlace.category}
-                </span>
               </div>
+              {/* Optional cover (for book-driven results) */}
+              {popupPlace.cover && (
+                <img style={{ maxWidth: 80, borderRadius: 8, marginBottom: 8 }} src={popupPlace.cover} alt="Cover" />
+              )}
               <div style={{ color: "#4B5563", marginBottom: 7, fontSize: "1em" }}>
-                {popupPlace.trivia}
+                {popupPlace.description}
               </div>
               {popupPlace.books && popupPlace.books.length > 0 && (
                 <div style={{ margin: '8px 0 8px 0' }}>
                   <div style={{ fontWeight: 500, marginBottom: 2, color: "#6B7280" }}>Books set here:</div>
                   <ul style={{ margin: 0, paddingLeft: '1em', fontSize: '0.98em', color: '#23272e' }}>
                     {popupPlace.books.map((b, idx) => (
-                      <li key={idx}><em>{b.title}</em> <span style={{ color: "#AC7A25" }}>by</span> {b.author}</li>
+                      <li key={idx} style={{marginBottom: 2}}>
+                        {!!b.cover && (
+                          <img src={b.cover} alt="cover" style={{ width: 18, height: 28, objectFit: "cover", borderRadius: 3, marginRight: 6, verticalAlign: "middle" }} />
+                        )}
+                        <em>{b.title}</em> <span style={{ color: "#AC7A25" }}>by</span> {b.author}
+                        {b.link && (
+                          <a href={b.link} target="_blank" rel="noopener noreferrer" className="link" style={{marginLeft: 4, fontSize: "1.01em"}}>🔗</a>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -394,8 +235,6 @@ function MapPanel({
         <div style={{ marginTop: 27, fontSize: '0.92em', color: '#9CA3AF', textAlign: 'center' }}>
           <span style={{ fontWeight: 500 }}>Legend:</span>
           <span style={{ marginLeft: 7 }}><span role="img" aria-label="pin">📍</span> = Place Marker</span>
-          <br />
-          <span>Click a marker for info, or use "Add to Bucket"!</span>
         </div>
       </div>
     </div>
@@ -404,12 +243,3 @@ function MapPanel({
 
 // PUBLIC_INTERFACE
 export default MapPanel;
-
-/**
- * Notes:
- * - In production, marker coordinates/Map API would be used instead of a "list".
- * - This file illustrates realistic interactive filtering, marker info, and bucket-list integration, ready for true API data.
- * - Future extension: Replace the simulated marker list with a geographic map (Leaflet, Google Maps, Mapbox, etc.).
- * - Optionally allow filter/search bar input above the map.
- */
-

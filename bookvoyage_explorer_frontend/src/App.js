@@ -5,124 +5,177 @@ import MapPanel from './MapPanel';
 import InfoPanel from './InfoPanel';
 import SearchBar from './SearchBar';
 import BucketList from './BucketList';
-import { fetchBooksFromGoogle, fetchWikipediaSummary } from "./api";
+import {
+  fetchBooksFromGoogle,
+  fetchWikipediaSummary,
+  fetchBooksByAuthor,
+  fetchBooksByPlace,
+} from "./api";
 
 /**
- * BookVoyage Explorer - Stateful Demo Container
+ * BookVoyage Explorer - Main Live Data Implementation
  * 
- * Handles mock state for places, map selection, bucket list, and trivia/info panels.
- * Passes relevant state and handlers to stub UI components for demo interactivity.
+ * Connects all feature components to real API data.
+ * - All sample/mock state is removed
+ * - State is updated asynchronously as the user searches/acts
+ * - UI shows loading/error indicators as appropriate
+ * - All trivia and result panels display true API-based results
  */
 function App() {
-  // Sample mock places for demo - in the future this would come from map API/book API
-  const MOCK_PLACES = [
-    {
-      id: 'paris',
-      name: 'Paris, France',
-      trivia: "Known as the City of Light, famous for the Eiffel Tower.",
-      books: [
-        { title: "The Hunchback of Notre-Dame", author: "Victor Hugo" },
-        { title: "Paris to the Moon", author: "Adam Gopnik" }
-      ]
-    },
-    {
-      id: 'london',
-      name: 'London, UK',
-      trivia: "Home of Big Ben, the British Museum, and Sherlock Holmes.",
-      books: [
-        { title: "Neverwhere", author: "Neil Gaiman" },
-        { title: "Oliver Twist", author: "Charles Dickens" }
-      ]
-    },
-    {
-      id: 'kyoto',
-      name: 'Kyoto, Japan',
-      trivia: "Ancient capital, famous for temples and cherry blossoms.",
-      books: [
-        { title: "Memoirs of a Geisha", author: "Arthur Golden" }
-      ]
-    }
-  ];
+  // ------ STATE ------
+  // Query/search term for books/authors/places (set by SearchBar)
+  const [searchType, setSearchType] = useState("place"); // "book", "author", "place"
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]); // books, authors, or places (depending on searchType)
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
 
-  // STATE
-  const [selectedPlaceId, setSelectedPlaceId] = useState(null); // id of the place selected on map
-  // Bucket list now stores array of {id, note} objects for each place in order
-  const [bucketList, setBucketList] = useState([]); // array of { id, note }
-  const [triviaInfo, setTriviaInfo] = useState({}); // {title, summary, books}
-  // Optionally, loading state for fetches (not needed for this stub)
+  // Detailed info for the currently selected place (or author/book)
+  const [selectedPlaceId, setSelectedPlaceId] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null); // {id, name, ...}
+  const [triviaInfo, setTriviaInfo] = useState(null); // {entries: [...]}
+  const [triviaLoading, setTriviaLoading] = useState(false);
+  const [triviaError, setTriviaError] = useState("");
 
-  // Select a place (triggers info panel/trivia refresh)
+  // Bucket list as array of {id, note} ("placeId", note)
+  const [bucketList, setBucketList] = useState([]);
+
+  // --- Default: No results yet ---
+  // On first load, show a starter search for "Paris"
+  useEffect(() => {
+    handleInitialDemoLoad();
+    // eslint-disable-next-line
+  }, []);
+
   // PUBLIC_INTERFACE
-  function handleSelectPlace(placeId) {
-    setSelectedPlaceId(placeId);
+  // Search handler: Fetches data from live APIs depending on type (book, author, place)
+  async function handleSearch(term, type) {
+    setSearchError("");
+    setSearchLoading(true);
+    setQuery(term);
+    setSearchType(type);
+    setSearchResults([]);
+    setSelectedPlaceId(null);
+    setTriviaInfo(null);
+    setTriviaError("");
 
-    // Demo: showing multiple trivia items for improved interactivity
-    // Here, for demo, we'll create multiple facts per place if available.
-    const place = MOCK_PLACES.find((p) => p.id === placeId);
-    if (place) {
-      // Multiple trivia entries demo: summary, url, and media
-      // In real app, you'd fetch richer data
-      let entries = [
-        {
-          title: place.name,
-          summary: place.trivia,
-          books: place.books
-        }
-      ];
-      // Add extra demo trivia fact, with a link for interactivity
-      if (place.name === "Paris, France") {
-        entries.push({
-          title: "Eiffel Tower Fact",
-          summary: "Did you know the <strong>Eiffel Tower</strong> was built for the 1889 World's Fair?",
-          link: "https://en.wikipedia.org/wiki/Eiffel_Tower",
-          cover: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg",
-          books: [
-            { title: "Paris Revealed", author: "Stephen Clarke", link: "https://www.goodreads.com/book/show/11199794-paris-revealed" }
-          ]
-        });
+    try {
+      let results = [];
+      if (type === "book") {
+        // Search for books by title/keyword
+        const data = await fetchBooksFromGoogle(term, { maxResults: 10 });
+        if (data.error) throw new Error(data.error);
+        results = (data.items || []).map(item => ({
+          id: item.id,
+          name: item.volumeInfo?.title || "Unknown Title",
+          author: (item.volumeInfo?.authors?.[0]) || "",
+          description: item.volumeInfo?.description,
+          cover: item.volumeInfo?.imageLinks?.thumbnail,
+          googleInfo: item
+        }));
+      } else if (type === "author") {
+        // Search for books by the given author
+        const data = await fetchBooksByAuthor(term, { maxResults: 10 });
+        if (data.error) throw new Error(data.error);
+        results = (data.items || []).map(item => ({
+          id: item.id,
+          name: item.volumeInfo?.title || "Unknown Title",
+          author: (item.volumeInfo?.authors?.[0]) || "",
+          description: item.volumeInfo?.description,
+          cover: item.volumeInfo?.imageLinks?.thumbnail,
+          googleInfo: item
+        }));
+      } else {
+        // type === "place" - show books + trivia about a place
+        // We'll search for books set in this place
+        const data = await fetchBooksByPlace(term, { maxResults: 7 });
+        if (data.error) throw new Error(data.error);
+        // Unlike demo, here each 'place' will be just one: what the user searched for
+        results = [{
+          id: term.toLowerCase().replace(/\s+/g, "_"),
+          name: term,
+          books: (data.items || []).map(item => ({
+            title: item.volumeInfo?.title || "Unknown Title",
+            author: (item.volumeInfo?.authors?.[0]) || "",
+            cover: item.volumeInfo?.imageLinks?.thumbnail,
+            link: item.volumeInfo?.infoLink
+          })),
+        }];
       }
-      if (place.name === "London, UK") {
-        entries.push({
-          title: "Sherlock Holmes",
-          summary: "221B Baker Street is the legendary home of Sherlock Holmes. See <a href='https://en.wikipedia.org/wiki/221B_Baker_Street'>221B Baker St</a>.",
-          link: "https://en.wikipedia.org/wiki/221B_Baker_Street",
-          books: [
-            { title: "The Adventures of Sherlock Holmes", author: "Arthur Conan Doyle", link: "https://www.goodreads.com/book/show/3590.The_Adventures_of_Sherlock_Holmes" }
-          ]
-        });
+      setSearchResults(results);
+      // By default, select the first result/place (for info panel)
+      if (results[0]) {
+        setSelectedPlaceId(results[0].id);
+        setSelectedPlace(results[0]);
+      } else {
+        setSelectedPlaceId(null);
+        setSelectedPlace(null);
       }
-      if (place.name === "Kyoto, Japan") {
-        entries.push({
-          title: "Kyoto Temples",
-          summary: "Fushimi Inari-taisha, with its 10,000 iconic torii gates, is a must-see.",
-          link: "https://en.wikipedia.org/wiki/Fushimi_Inari-taisha"
-        });
-      }
-      setTriviaInfo({ entries });
+    } catch (err) {
+      setSearchError(err?.message || "Unknown error during search.");
     }
+    setSearchLoading(false);
   }
 
-  // Add a place to the bucket list (with note field, and de-dupe by id)
   // PUBLIC_INTERFACE
+  // Initial demo load: show "Paris" books and trivia
+  async function handleInitialDemoLoad() {
+    setQuery("Paris");
+    setSearchType("place");
+    await handleSearch("Paris", "place");
+  }
+
+  // PUBLIC_INTERFACE
+  // Handler for selecting a place (or book/author result) - fetch trivia/info
+  async function handleSelectPlace(placeId) {
+    let place = searchResults.find(p => p.id === placeId);
+    if (!place && bucketList.some(item => item.id === placeId)) {
+      // Try to get from bucket list (if user clicks from there)
+      place = bucketList.find(item => item.id === placeId);
+    }
+    setSelectedPlaceId(placeId);
+    setSelectedPlace(place);
+
+    // Fetch Wikipedia summary for this place (or author/book)
+    setTriviaLoading(true);
+    setTriviaError("");
+    setTriviaInfo(null);
+    const title = place?.name || "";
+    let entries = [];
+    try {
+      // Always try to get Wikipedia summary
+      const wikiData = await fetchWikipediaSummary(title);
+      entries.push({
+        title: wikiData.title || title,
+        summary: wikiData.summary || "",
+        link: wikiData.url,
+        cover: wikiData.thumbnail,
+        books: place?.books
+      });
+      // Show books only if present for this place (if not, omit)
+      setTriviaInfo({ entries });
+    } catch (err) {
+      setTriviaError(err?.message || "Unable to fetch trivia for this place.");
+      setTriviaInfo({ entries: [] });
+    }
+    setTriviaLoading(false);
+  }
+
+  // PUBLIC_INTERFACE
+  // Add a place to the bucket list (de-duplicate by id)
   function handleAddToBucket(placeId) {
     setBucketList((prev) => {
-      // Support legacy: prev might be array of ids
-      const items = Array.isArray(prev)
-        ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" })))
-        : [];
+      const items = Array.isArray(prev) ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" }))) : [];
       if (items.some(item => item.id === placeId)) return items;
       return [...items, { id: placeId, note: "" }];
     });
   }
 
-  // Remove a place from the bucket list
   // PUBLIC_INTERFACE
+  // Remove a place from the bucket list
   function handleRemoveFromBucket(placeId) {
     setBucketList((prev) => {
-      // Support legacy: prev might be array of ids
-      const items = Array.isArray(prev)
-        ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" })))
-        : [];
+      const items = Array.isArray(prev) ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" }))) : [];
       return items.filter(item => item.id !== placeId);
     });
   }
@@ -143,13 +196,18 @@ function App() {
     );
   }
 
-  // Demo useEffect: On first load, show trivia for first mock place
+  // When user selects different place or result from Map or search results, update info
   useEffect(() => {
-    handleSelectPlace(MOCK_PLACES[0].id);
-    // Optionally: can demo sample fetchBooksFromGoogle/fetchWikipediaSummary here
-  }, []); // Only run once
+    if (selectedPlaceId && searchResults.length > 0) {
+      handleSelectPlace(selectedPlaceId);
+    }
+    // eslint-disable-next-line
+  }, [selectedPlaceId]);
 
-  // Pass props for demo interactivity
+  // UI props for MapPanel/BucketList - show results as 'places'
+  const placesForMap = searchType === "place" ? searchResults : [];
+
+  // --- Render Main UI ---
   return (
     <div className="app">
       <nav
@@ -169,7 +227,6 @@ function App() {
             <div className="logo">
               <span className="logo-symbol" role="img" aria-label="Book icon">📚</span>
               BookVoyage Explorer
-              {/* In CRA, assets are loaded using process.env.PUBLIC_URL; ensure no unguarded usage */}
             </div>
             <button className="btn" disabled>Login (placeholder)</button>
           </div>
@@ -179,30 +236,49 @@ function App() {
       <div className="main-content">
         {/* Sidebar Trivia/Info */}
         <InfoPanel
-          triviaInfo={triviaInfo}
+          triviaInfo={triviaLoading && selectedPlaceId ? {entries:[{title: 'Loading...', summary: 'Fetching live info...'}]} : triviaError && selectedPlaceId ? {entries:[{title:'Error', summary:triviaError}]} : triviaInfo}
           selectedPlaceId={selectedPlaceId}
         />
 
         <section className="explorer-panel">
           <SearchBar
-            // Could later pass onSearch handler that updates map etc.
+            onSearch={handleSearch}
+            isLoading={searchLoading}
+            error={searchError}
+            initialType={searchType}
+            initialQuery={query}
           />
+          {/* Display list/map of results only after search */}
           <div className="map-and-bucket">
             <MapPanel
-              places={MOCK_PLACES}
+              places={placesForMap}
               selectedPlaceId={selectedPlaceId}
-              onSelectPlace={handleSelectPlace}
+              onSelectPlace={id => setSelectedPlaceId(id)}
               onAddToBucket={handleAddToBucket}
-              bucketList={bucketList}
+              bucketList={bucketList.map(x => x.id)}
+              isLoading={searchLoading}
             />
             <BucketList
-              places={MOCK_PLACES}
+              places={placesForMap}
               bucketList={bucketList}
               onRemoveFromBucket={handleRemoveFromBucket}
               onUpdateBucketListReorder={handleReorderBucketList}
               onUpdateNote={handleUpdateNote}
             />
           </div>
+          {searchLoading && (
+            <div style={{
+              color: "#4B5563", fontWeight: 500, margin: "14px auto 0 auto", textAlign: "center"
+            }}>Searching for {searchType === "book" ? "books" : searchType === "author" ? "authors" : "places"}&hellip;</div>
+          )}
+          {searchError && (
+            <div style={{
+              color: "red",
+              fontWeight: 500,
+              margin: "14px auto 0 auto",
+              textAlign: "center"
+            }}>{searchError}</div>
+          )}
         </section>
       </div>
     </div>
