@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 import MapPanel from './MapPanel';
@@ -13,201 +13,199 @@ import {
 } from "./api";
 
 /**
- * BookVoyage Explorer - Main Live Data Implementation
+ * BookVoyage Explorer - Refactored for Live Async Data
  * 
- * Connects all feature components to real API data.
- * - All sample/mock state is removed
- * - State is updated asynchronously as the user searches/acts
- * - UI shows loading/error indicators as appropriate
- * - All trivia and result panels display true API-based results
+ * - All data flows (places, trivia/info, search, bucket list) use api.js with async responses
+ * - State includes loading & error states for all async operations
+ * - Removes demo/static/mock data
+ * - Core UI handlers and flows updated for live API state
  */
 function App() {
-  // ------ STATE ------
-  // Query/search term for books/authors/places (set by SearchBar)
-  const [searchType, setSearchType] = useState("place"); // "book", "author", "place"
+  const [searchType, setSearchType] = useState("place");
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]); // books, authors, or places (depending on searchType)
+  const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
 
-  // Detailed info for the currently selected place (or author/book)
   const [selectedPlaceId, setSelectedPlaceId] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null); // {id, name, ...}
-  const [triviaInfo, setTriviaInfo] = useState(null); // {entries: [...]}
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [triviaInfo, setTriviaInfo] = useState(null);
   const [triviaLoading, setTriviaLoading] = useState(false);
   const [triviaError, setTriviaError] = useState("");
 
-  // Bucket list as array of {id, note} ("placeId", note)
-  const [bucketList, setBucketList] = useState([]);
+  const [bucketList, setBucketList] = useState([]); // array of {id, note}
 
-  // --- Default: No results yet ---
-  // On first load, show a starter search for "Paris"
+  // Helper: forcibly get latest place obj from either searchResults or bucketList
+  const findPlaceById = useCallback(
+    (id) =>
+      searchResults.find((p) => p.id === id) ||
+      bucketList.find((item) => item.id === id) ||
+      null,
+    [searchResults, bucketList]
+  );
+
+  // PUBLIC_INTERFACE
+  // Search for books, authors, or places using API (removes static fallback)
+  const handleSearch = useCallback(
+    async (term, type) => {
+      setSearchError("");
+      setSearchLoading(true);
+      setQuery(term);
+      setSearchType(type);
+      setSearchResults([]);
+      setSelectedPlaceId(null);
+      setTriviaInfo(null);
+      setTriviaError("");
+
+      try {
+        let results = [];
+        if (type === "book") {
+          const data = await fetchBooksFromGoogle(term, { maxResults: 10 });
+          if (data.error) throw new Error(data.error);
+          results = (data.items || []).map(item => ({
+            id: item.id,
+            name: item.volumeInfo?.title || "Unknown Title",
+            author: item.volumeInfo?.authors?.[0] || "",
+            description: item.volumeInfo?.description,
+            cover: item.volumeInfo?.imageLinks?.thumbnail,
+            googleInfo: item
+          }));
+        } else if (type === "author") {
+          const data = await fetchBooksByAuthor(term, { maxResults: 10 });
+          if (data.error) throw new Error(data.error);
+          results = (data.items || []).map(item => ({
+            id: item.id,
+            name: item.volumeInfo?.title || "Unknown Title",
+            author: item.volumeInfo?.authors?.[0] || "",
+            description: item.volumeInfo?.description,
+            cover: item.volumeInfo?.imageLinks?.thumbnail,
+            googleInfo: item
+          }));
+        } else {
+          const data = await fetchBooksByPlace(term, { maxResults: 7 });
+          if (data.error) throw new Error(data.error);
+          results = [
+            {
+              id: term.toLowerCase().replace(/\s+/g, "_"),
+              name: term,
+              books: (data.items || []).map(item => ({
+                title: item.volumeInfo?.title || "Unknown Title",
+                author: item.volumeInfo?.authors?.[0] || "",
+                cover: item.volumeInfo?.imageLinks?.thumbnail,
+                link: item.volumeInfo?.infoLink,
+              })),
+            },
+          ];
+        }
+        setSearchResults(results);
+        if (results[0]) {
+          setSelectedPlaceId(results[0].id);
+          setSelectedPlace(results[0]);
+        } else {
+          setSelectedPlaceId(null);
+          setSelectedPlace(null);
+        }
+      } catch (err) {
+        setSearchError(err?.message || "Unknown error during search.");
+      }
+      setSearchLoading(false);
+    },
+    [setSearchType, setQuery, setSearchResults, setSelectedPlaceId, setSelectedPlace, setSearchError, setSearchLoading]
+  );
+
+  // PUBLIC_INTERFACE
+  // Initial demo/search load
   useEffect(() => {
-    handleInitialDemoLoad();
+    (async () => {
+      setQuery("Paris");
+      setSearchType("place");
+      await handleSearch("Paris", "place");
+    })();
     // eslint-disable-next-line
   }, []);
 
   // PUBLIC_INTERFACE
-  // Search handler: Fetches data from live APIs depending on type (book, author, place)
-  async function handleSearch(term, type) {
-    setSearchError("");
-    setSearchLoading(true);
-    setQuery(term);
-    setSearchType(type);
-    setSearchResults([]);
-    setSelectedPlaceId(null);
-    setTriviaInfo(null);
-    setTriviaError("");
+  // Select a place/book/author and retrieve live trivia/info
+  const handleSelectPlace = useCallback(
+    async (placeId) => {
+      const place = findPlaceById(placeId);
+      setSelectedPlaceId(placeId);
+      setSelectedPlace(place);
 
-    try {
-      let results = [];
-      if (type === "book") {
-        // Search for books by title/keyword
-        const data = await fetchBooksFromGoogle(term, { maxResults: 10 });
-        if (data.error) throw new Error(data.error);
-        results = (data.items || []).map(item => ({
-          id: item.id,
-          name: item.volumeInfo?.title || "Unknown Title",
-          author: (item.volumeInfo?.authors?.[0]) || "",
-          description: item.volumeInfo?.description,
-          cover: item.volumeInfo?.imageLinks?.thumbnail,
-          googleInfo: item
-        }));
-      } else if (type === "author") {
-        // Search for books by the given author
-        const data = await fetchBooksByAuthor(term, { maxResults: 10 });
-        if (data.error) throw new Error(data.error);
-        results = (data.items || []).map(item => ({
-          id: item.id,
-          name: item.volumeInfo?.title || "Unknown Title",
-          author: (item.volumeInfo?.authors?.[0]) || "",
-          description: item.volumeInfo?.description,
-          cover: item.volumeInfo?.imageLinks?.thumbnail,
-          googleInfo: item
-        }));
-      } else {
-        // type === "place" - show books + trivia about a place
-        // We'll search for books set in this place
-        const data = await fetchBooksByPlace(term, { maxResults: 7 });
-        if (data.error) throw new Error(data.error);
-        // Unlike demo, here each 'place' will be just one: what the user searched for
-        results = [{
-          id: term.toLowerCase().replace(/\s+/g, "_"),
-          name: term,
-          books: (data.items || []).map(item => ({
-            title: item.volumeInfo?.title || "Unknown Title",
-            author: (item.volumeInfo?.authors?.[0]) || "",
-            cover: item.volumeInfo?.imageLinks?.thumbnail,
-            link: item.volumeInfo?.infoLink
-          })),
-        }];
+      setTriviaLoading(true);
+      setTriviaError("");
+      setTriviaInfo(null);
+
+      try {
+        const title = place?.name || "";
+        const wikiData = await fetchWikipediaSummary(title);
+        setTriviaInfo({
+          entries: [
+            {
+              title: wikiData.title || title,
+              summary: wikiData.summary || "",
+              link: wikiData.url,
+              cover: wikiData.thumbnail,
+              books: place?.books
+            },
+          ],
+        });
+      } catch (err) {
+        setTriviaError(err?.message || "Unable to fetch trivia for this place.");
+        setTriviaInfo({ entries: [] });
       }
-      setSearchResults(results);
-      // By default, select the first result/place (for info panel)
-      if (results[0]) {
-        setSelectedPlaceId(results[0].id);
-        setSelectedPlace(results[0]);
-      } else {
-        setSelectedPlaceId(null);
-        setSelectedPlace(null);
-      }
-    } catch (err) {
-      setSearchError(err?.message || "Unknown error during search.");
-    }
-    setSearchLoading(false);
-  }
+      setTriviaLoading(false);
+    },
+    [findPlaceById, setSelectedPlace, setTriviaLoading, setTriviaError, setTriviaInfo]
+  );
 
   // PUBLIC_INTERFACE
-  // Initial demo load: show "Paris" books and trivia
-  async function handleInitialDemoLoad() {
-    setQuery("Paris");
-    setSearchType("place");
-    await handleSearch("Paris", "place");
-  }
-
-  // PUBLIC_INTERFACE
-  // Handler for selecting a place (or book/author result) - fetch trivia/info
-  async function handleSelectPlace(placeId) {
-    let place = searchResults.find(p => p.id === placeId);
-    if (!place && bucketList.some(item => item.id === placeId)) {
-      // Try to get from bucket list (if user clicks from there)
-      place = bucketList.find(item => item.id === placeId);
-    }
-    setSelectedPlaceId(placeId);
-    setSelectedPlace(place);
-
-    // Fetch Wikipedia summary for this place (or author/book)
-    setTriviaLoading(true);
-    setTriviaError("");
-    setTriviaInfo(null);
-    const title = place?.name || "";
-    let entries = [];
-    try {
-      // Always try to get Wikipedia summary
-      const wikiData = await fetchWikipediaSummary(title);
-      entries.push({
-        title: wikiData.title || title,
-        summary: wikiData.summary || "",
-        link: wikiData.url,
-        cover: wikiData.thumbnail,
-        books: place?.books
-      });
-      // Show books only if present for this place (if not, omit)
-      setTriviaInfo({ entries });
-    } catch (err) {
-      setTriviaError(err?.message || "Unable to fetch trivia for this place.");
-      setTriviaInfo({ entries: [] });
-    }
-    setTriviaLoading(false);
-  }
-
-  // PUBLIC_INTERFACE
-  // Add a place to the bucket list (de-duplicate by id)
   function handleAddToBucket(placeId) {
-    setBucketList((prev) => {
-      const items = Array.isArray(prev) ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" }))) : [];
-      if (items.some(item => item.id === placeId)) return items;
-      return [...items, { id: placeId, note: "" }];
+    setBucketList(prev => {
+      const norm = Array.isArray(prev)
+        ? typeof prev[0] === "object"
+          ? prev
+          : prev.map((id) => ({ id, note: "" }))
+        : [];
+      if (norm.some(item => item.id === placeId)) return norm;
+      return [...norm, { id: placeId, note: "" }];
     });
   }
-
   // PUBLIC_INTERFACE
-  // Remove a place from the bucket list
   function handleRemoveFromBucket(placeId) {
-    setBucketList((prev) => {
-      const items = Array.isArray(prev) ? (typeof prev[0] === "object" ? prev : prev.map(id => ({ id, note: "" }))) : [];
-      return items.filter(item => item.id !== placeId);
+    setBucketList(prev => {
+      const norm = Array.isArray(prev)
+        ? typeof prev[0] === "object"
+          ? prev
+          : prev.map((id) => ({ id, note: "" }))
+        : [];
+      return norm.filter(item => item.id !== placeId);
     });
   }
-
   // PUBLIC_INTERFACE
-  // Handler to reorder bucket list items (list is array of { id, note })
   function handleReorderBucketList(newList) {
     setBucketList(newList);
   }
-
   // PUBLIC_INTERFACE
-  // Handler to update note per place in bucket
   function handleUpdateNote(placeId, note) {
-    setBucketList((prev) =>
+    setBucketList(prev =>
       prev.map((item) =>
         item.id === placeId ? { ...item, note } : item
       )
     );
   }
 
-  // When user selects different place or result from Map or search results, update info
+  // Whenever user selects a new place, fetch new trivia/info asynchronously
   useEffect(() => {
-    if (selectedPlaceId && searchResults.length > 0) {
-      handleSelectPlace(selectedPlaceId);
-    }
+    if (!selectedPlaceId) return;
+    handleSelectPlace(selectedPlaceId);
     // eslint-disable-next-line
   }, [selectedPlaceId]);
 
-  // UI props for MapPanel/BucketList - show results as 'places'
+  // Only show places in map/bucket picker if result type is "place"
   const placesForMap = searchType === "place" ? searchResults : [];
 
-  // --- Render Main UI ---
+  // --- UI Render ---
   return (
     <div className="app">
       <nav
@@ -232,14 +230,17 @@ function App() {
           </div>
         </div>
       </nav>
-
       <div className="main-content">
-        {/* Sidebar Trivia/Info */}
         <InfoPanel
-          triviaInfo={triviaLoading && selectedPlaceId ? {entries:[{title: 'Loading...', summary: 'Fetching live info...'}]} : triviaError && selectedPlaceId ? {entries:[{title:'Error', summary:triviaError}]} : triviaInfo}
+          triviaInfo={
+            triviaLoading && selectedPlaceId
+              ? { entries: [{ title: 'Loading...', summary: 'Fetching live info...' }] }
+              : triviaError && selectedPlaceId
+                ? { entries: [{ title: 'Error', summary: triviaError }] }
+                : triviaInfo
+          }
           selectedPlaceId={selectedPlaceId}
         />
-
         <section className="explorer-panel">
           <SearchBar
             onSearch={handleSearch}
@@ -248,7 +249,6 @@ function App() {
             initialType={searchType}
             initialQuery={query}
           />
-          {/* Display list/map of results only after search */}
           <div className="map-and-bucket">
             <MapPanel
               places={placesForMap}
@@ -269,7 +269,9 @@ function App() {
           {searchLoading && (
             <div style={{
               color: "#4B5563", fontWeight: 500, margin: "14px auto 0 auto", textAlign: "center"
-            }}>Searching for {searchType === "book" ? "books" : searchType === "author" ? "authors" : "places"}&hellip;</div>
+            }}>
+              Searching for {searchType === "book" ? "books" : searchType === "author" ? "authors" : "places"}&hellip;
+            </div>
           )}
           {searchError && (
             <div style={{
