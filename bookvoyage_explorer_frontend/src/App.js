@@ -106,6 +106,7 @@ function App() {
             <div className="logo">
               <span className="logo-symbol" role="img" aria-label="Book icon">📚</span>
               BookVoyage Explorer
+              {/* In CRA, assets are loaded using process.env.PUBLIC_URL; ensure no unguarded usage */}
             </div>
             <button className="btn" disabled>Login (placeholder)</button>
           </div>
