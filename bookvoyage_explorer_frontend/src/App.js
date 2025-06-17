@@ -1,6 +1,12 @@
 import React from 'react';
 import './App.css';
 
+// Import stub components (now used for layout)
+import MapPanel from './MapPanel';
+import InfoPanel from './InfoPanel';
+import SearchBar from './SearchBar';
+import BucketList from './BucketList';
+
 /**
  * BookVoyage Explorer Main Container & Component Hierarchy
  * 
@@ -40,46 +46,17 @@ function App() {
       {/* Main Layout Container */}
       <div className="main-content">
         {/* Sidebar for Info/Trivia */}
-        <aside className="sidebar">
-          {/* INFO/TRIVIA SIDEBAR */}
-          {/* Replace placeholder with real trivia/info in future */}
-          <h2>Trivia & Info</h2>
-          <div className="sidebar-content">
-            <p>[Trivia and information about selected book, author, or place will appear here.]</p>
-          </div>
-        </aside>
+        <InfoPanel />
 
         {/* Main explorer area (map/search/bucket list) */}
         <section className="explorer-panel">
           {/* Search Bar */}
-          <header className="search-bar">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search books, authors, or places..."
-              disabled
-            />
-            <button className="btn" disabled>Search</button>
-          </header>
+          <SearchBar />
 
           {/* Map & Bucket List Panel Row */}
           <div className="map-and-bucket">
-            {/* Interactive Map Placeholder */}
-            <div className="map-panel">
-              <div className="map-placeholder">
-                <h3>Interactive Map</h3>
-                <p>[An interactive world map will appear here.]</p>
-              </div>
-            </div>
-            {/* Bucket List Panel */}
-            <aside className="bucket-list">
-              <h2>Bucket List</h2>
-              <div className="bucket-list-content">
-                <ul>
-                  <li>[Your saved places will appear here!]</li>
-                </ul>
-              </div>
-            </aside>
+            <MapPanel />
+            <BucketList />
           </div>
         </section>
       </div>
