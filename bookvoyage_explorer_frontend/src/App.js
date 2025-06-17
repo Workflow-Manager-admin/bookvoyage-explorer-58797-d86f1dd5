@@ -1,60 +1,108 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Import stub components (now used for layout)
 import MapPanel from './MapPanel';
 import InfoPanel from './InfoPanel';
 import SearchBar from './SearchBar';
 import BucketList from './BucketList';
-// Import the API stub functions
 import { fetchBooksFromGoogle, fetchWikipediaSummary } from "./api";
 
 /**
- * BookVoyage Explorer Main Container & Component Hierarchy
+ * BookVoyage Explorer - Stateful Demo Container
  * 
- * Layout structure:
- * 
- * <div className="app">
- *   <nav className="navbar"> ... </nav>
- *   <div className="main-content">
- *     <aside className="sidebar"> [Trivia/Info Panel] </aside>
- *     <section className="explorer-panel">
- *       <header className="search-bar"> [Search Bar] </header>
- *       <div className="map-and-bucket">
- *         <div className="map-panel"> [Interactive Map Placeholder] </div>
- *         <aside className="bucket-list"> [Bucket List Panel] </aside>
- *       </div>
- *     </section>
- *   </div>
- * </div>
+ * Handles mock state for places, map selection, bucket list, and trivia/info panels.
+ * Passes relevant state and handlers to stub UI components for demo interactivity.
  */
-
-
 function App() {
-
-  // Example stub usage: fetch dummy book and Wikipedia data on mount;
-  // Replace with stateful/search-driven logic in future.
-  useEffect(() => {
-    // TODO: Remove this example, integrate calls where user searches or selects a book/place.
-    async function demoStubCalls() {
-      // Fetch dummy Google Books data for "Paris"
-      const books = await fetchBooksFromGoogle("Paris");
-      console.log("[STUB DEMO] Google Books API result:", books);
-
-      // Fetch dummy Wikipedia info for "Paris"
-      const wiki = await fetchWikipediaSummary("Paris");
-      console.log("[STUB DEMO] Wikipedia API result:", wiki);
+  // Sample mock places for demo - in the future this would come from map API/book API
+  const MOCK_PLACES = [
+    {
+      id: 'paris',
+      name: 'Paris, France',
+      trivia: "Known as the City of Light, famous for the Eiffel Tower.",
+      books: [
+        { title: "The Hunchback of Notre-Dame", author: "Victor Hugo" },
+        { title: "Paris to the Moon", author: "Adam Gopnik" }
+      ]
+    },
+    {
+      id: 'london',
+      name: 'London, UK',
+      trivia: "Home of Big Ben, the British Museum, and Sherlock Holmes.",
+      books: [
+        { title: "Neverwhere", author: "Neil Gaiman" },
+        { title: "Oliver Twist", author: "Charles Dickens" }
+      ]
+    },
+    {
+      id: 'kyoto',
+      name: 'Kyoto, Japan',
+      trivia: "Ancient capital, famous for temples and cherry blossoms.",
+      books: [
+        { title: "Memoirs of a Geisha", author: "Arthur Golden" }
+      ]
     }
-    demoStubCalls();
-  }, []);
-  
+  ];
 
+  // STATE
+  const [selectedPlaceId, setSelectedPlaceId] = useState(null); // id of the place selected on map
+  const [bucketList, setBucketList] = useState([]); // array of place ids
+  const [triviaInfo, setTriviaInfo] = useState({}); // {title, summary, books}
+  // Optionally, loading state for fetches (not needed for this stub)
+
+  // Select a place (triggers info panel/trivia refresh)
+  // PUBLIC_INTERFACE
+  function handleSelectPlace(placeId) {
+    setSelectedPlaceId(placeId);
+
+    // Demo: show sample trivia & books for selected place
+    const place = MOCK_PLACES.find((p) => p.id === placeId);
+    if (place) {
+      setTriviaInfo({
+        title: place.name,
+        summary: place.trivia,
+        books: place.books
+      });
+    }
+  }
+
+  // Add a place to the bucket list
+  // PUBLIC_INTERFACE
+  function handleAddToBucket(placeId) {
+    setBucketList((prev) =>
+      prev.includes(placeId) ? prev : [...prev, placeId]
+    );
+  }
+
+  // Remove a place from the bucket list
+  // PUBLIC_INTERFACE
+  function handleRemoveFromBucket(placeId) {
+    setBucketList((prev) => prev.filter((id) => id !== placeId));
+  }
+
+  // Demo useEffect: On first load, show trivia for first mock place
+  useEffect(() => {
+    handleSelectPlace(MOCK_PLACES[0].id);
+    // Optionally: can demo sample fetchBooksFromGoogle/fetchWikipediaSummary here
+  }, []); // Only run once
+
+  // Pass props for demo interactivity
   return (
     <div className="app">
-      {/* Top Navbar/Header */}
-      <nav className="navbar">
+      <nav
+        className="navbar"
+        style={{
+          color: '#4b5563',
+          backgroundColor: '#0d1301'
+        }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
+            color: '#4b5563',
+            backgroundColor: '#0be4f4'
+          }}>
             <div className="logo">
               <span className="logo-symbol" role="img" aria-label="Book icon">📚</span>
               BookVoyage Explorer
@@ -64,29 +112,29 @@ function App() {
         </div>
       </nav>
 
-      {/* Main Layout Container */}
       <div className="main-content">
-        {/* Sidebar for Info/Trivia */}
-        <InfoPanel />
+        {/* Sidebar Trivia/Info */}
+        <InfoPanel
+          triviaInfo={triviaInfo}
+          selectedPlaceId={selectedPlaceId}
+        />
 
-        {/* Main explorer area (map/search/bucket list) */}
         <section className="explorer-panel">
-          {/* Search Bar */}
-          <SearchBar 
-            // TODO: Integrate API stubs - Example:
-            // onSearch={async (query) => {
-            //   const books = await fetchBooksFromGoogle(query);
-            //   // Use books data for state/display
-            // }}
+          <SearchBar
+            // Could later pass onSearch handler that updates map etc.
           />
-
-          {/* Map & Bucket List Panel Row */}
           <div className="map-and-bucket">
-            <MapPanel 
-              // TODO: Use Google Books and Wikipedia data to highlight locations on the map.
+            <MapPanel
+              places={MOCK_PLACES}
+              selectedPlaceId={selectedPlaceId}
+              onSelectPlace={handleSelectPlace}
+              onAddToBucket={handleAddToBucket}
+              bucketList={bucketList}
             />
-            <BucketList 
-              // TODO: Save items retrieved from API stubs to the bucket list
+            <BucketList
+              places={MOCK_PLACES}
+              bucketList={bucketList}
+              onRemoveFromBucket={handleRemoveFromBucket}
             />
           </div>
         </section>
